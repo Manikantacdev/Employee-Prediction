@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/submit.css') }}">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <h1><i class="fas fa-chart-line"></i> Employee Productivity Prediction</h1>
+        <div class="nav-links">
+            <a href="/"><i class="fas fa-home"></i> Home</a>
+            <a href="/about"><i class="fas fa-info-circle"></i> About</a>
+            <a href="/predict"><i class="fas fa-brain"></i> Predict</a>
+        </div>
+    </div>
+
+    <div class="result-container">
+        <div class="result-header">
+            <h1 style="color: white; font-size: 2.5rem; margin-bottom: 20px;">
+                <i class="fas fa-check-circle"></i> Prediction Results
+            </h1>
+        </div>
+
+        <div class="result-card">
+            <div class="result-text">
+                {{ prediction_text }}
+            </div>
+            
+            {% if prediction_value %}
+            <div class="prediction-value">
+                <i class="fas fa-chart-bar"></i> Productivity Score: {{ prediction_value }}
+            </div>
+            {% endif %}
+            
+            <div style="text-align: center;">
+                <span class="result-badge {{ productivity_class }}">
+                    {% if productivity_class == 'average' %}
+                        <i class="fas fa-star"></i> Average Productivity
+                    {% elif productivity_class == 'medium' %}
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i> Medium Productivity
+                    {% elif productivity_class == 'high' %}
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> High Productivity
+                    {% else %}
+                        <i class="fas fa-exclamation-triangle"></i> Error
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        {% if graphs and graphs|length > 0 %}
+        <div class="insight-section">
+            <h3><i class="fas fa-lightbulb"></i> Key Insights</h3>
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h4>Data-Driven Analysis</h4>
+                    <p>Based on comprehensive analysis of {{ graphs|length }} key metrics</p>
+                </div>
+                <div class="insight-card">
+                    <i class="fas fa-brain"></i>
+                    <h4>ML Powered</h4>
+                    <p>Advanced machine learning algorithms for accurate predictions</p>
+                </div>
+                <div class="insight-card">
+                    <i class="fas fa-users"></i>
+                    <h4>Team Optimization</h4>
+                    <p>Insights to improve overall team productivity</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            <i class="fas fa-chart-pie"></i> Detailed Analysis & Visualizations
+        </h2>
+
+        <div class="charts-grid">
+            {% for graph in graphs %}
+            <div class="chart-card">
+                <div class="chart-title">
+                    {% if 'correlation' in graph %}
+                        <i class="fas fa-project-diagram"></i> Feature Correlation Heatmap
+                    {% elif 'distribution' in graph %}
+                        <i class="fas fa-chart-area"></i> Productivity Distribution
+                    {% elif 'department' in graph %}
+                        <i class="fas fa-building"></i> Department-wise Productivity
+                    {% elif 'overtime' in graph %}
+                        <i class="fas fa-clock"></i> Overtime vs Productivity
+                    {% elif 'incentive' in graph %}
+                        <i class="fas fa-coins"></i> Incentive Impact Analysis
+                    {% elif 'team' in graph %}
+                        <i class="fas fa-users"></i> Team Size vs Productivity
+                    {% endif %}
+                </div>
+                <img src="{{ url_for('static', filename=graph) }}" alt="Analysis Chart">
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="result-card" style="text-align: center;">
+            <i class="fas fa-info-circle" style="font-size: 3rem; color: #667eea; margin-bottom: 20px;"></i>
+            <p style="font-size: 1.2rem; color: #666;">Analysis graphs will be generated after prediction.</p>
+        </div>
+        {% endif %}
+
+        <a href="/predict" class="back-button">
+            <i class="fas fa-arrow-left"></i> Make Another Prediction
+        </a>
+    </div>
+
+</body>
+
+</html>
