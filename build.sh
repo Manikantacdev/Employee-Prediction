@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
-# Render build script
+# Render build script - Force Python 3.11
+
+set -e  # Exit on error
+
+echo "==> Python version check..."
+python --version
 
 # Upgrade pip
-pip install --upgrade pip setuptools wheel
+echo "==> Upgrading pip..."
+python -m pip install --upgrade pip
 
-# Install dependencies with pre-built wheels (no source compilation)
-pip install --no-cache-dir --prefer-binary -r requirements.txt
+# Install dependencies with pre-built wheels only (no compilation)
+echo "==> Installing dependencies..."
+pip install --only-binary=:all: --no-cache-dir -r requirements.txt || \
+pip install --prefer-binary --no-cache-dir -r requirements.txt
 
-echo "Build completed successfully!"
+echo "==> Build completed successfully!"
