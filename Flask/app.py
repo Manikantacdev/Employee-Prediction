@@ -29,10 +29,30 @@ try:
     print(f"Loading model from: {model_path}")
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
-    model = pickle.load(open(model_path, 'rb'))
-    print("Model loaded successfully!")
+    
+    # Suppress XGBoost serialization warnings for old models
+    import warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=UserWarning)
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+    
+    # Verify model loaded correctly
+    if model is None:
+        raise ValueError("Model loaded as None")
+    
+    print(f"✓ Model loaded successfully! Type: {type(model).__name__}")
+    
+    # Test with dummy data to ensure it works
+    try:
+        test_pred = model.predict([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]])
+        print(f"✓ Model test prediction: {test_pred[0]:.4f}")
+    except Exception as test_error:
+        print(f"⚠ Model test warning: {test_error}")
+        # Continue anyway - the model might still work for actual predictions
+        
 except Exception as e:
-    print(f"ERROR loading model: {str(e)}")
+    print(f"✗ ERROR loading model: {str(e)}")
     traceback.print_exc()
     model = None
 
