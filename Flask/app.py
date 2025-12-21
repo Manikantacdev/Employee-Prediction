@@ -8,23 +8,62 @@ matplotlib.use('Agg')  # Use non-GUI backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
+
 import hashlib
 import json
+import sys
+import traceback
 
 app = Flask(__name__)
 
-# Load model from Flask folder
-model_path = os.path.join(os.path.dirname(__file__), 'gwp.pkl')
-model = pickle.load(open(model_path, 'rb'))
+# Get absolute paths for deployment
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
 
-# Load dataset once at startup
-dataset_path = os.path.join(os.path.dirname(__file__), '..', 'Dataset', 'garments_worker_productivity.csv')
-data = pd.read_csv(dataset_path)
+print(f"Base directory: {BASE_DIR}")
+print(f"Project root: {PROJECT_ROOT}")
 
-# Create static directory for saving graphs
-static_dir = os.path.join(os.path.dirname(__file__), 'static')
-if not os.path.exists(static_dir):
-    os.makedirs(static_dir)
+# Load model from Flask folder with error handling
+try:
+    model_path = os.path.join(BASE_DIR, 'gwp.pkl')
+    print(f"Loading model from: {model_path}")
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found at {model_path}")
+    model = pickle.load(open(model_path, 'rb'))
+    print("Model loaded successfully!")
+except Exception as e:
+    print(f"ERROR loading model: {str(e)}")
+    traceback.print_exc()
+    model = None
+
+# Load dataset once at startup with error handling
+try:
+    dataset_path = os.path.join(PROJECT_ROOT, 'Dataset', 'garments_worker_productivity.csv')
+    print(f"Loading dataset from: {dataset_path}")
+    if not os.path.exists(dataset_path):
+        raise FileNotFoundError(f"Dataset file not found at {dataset_path}")
+    data = pd.read_csv(dataset_path)
+    print(f"Dataset loaded successfully! Shape: {data.shape}")
+except Exception as e:
+    print(f"ERROR loading dataset: {str(e)}")
+    traceback.print_exc()
+    data = None
+
+# Create static directory for saving graphs with proper permissions
+static_dir = os.path.join(BASE_DIR, 'static')
+try:
+    if not os.path.exists(static_dir):
+        os.makedirs(static_dir, exist_ok=True)
+        print(f"Created static directory: {static_dir}")
+    # Test write permissions
+    test_file = os.path.join(static_dir, 'test_write.txt')
+    with open(test_file, 'w') as f:
+        f.write('test')
+    os.remove(test_file)
+    print("Static directory is writable!")
+except Exception as e:
+    print(f"ERROR with static directory: {str(e)}")
+    traceback.print_exc()
 
 # Cache for generated graphs to improve performance
 graph_cache = {}
@@ -157,6 +196,12 @@ def home2():
 @app.route("/pred", methods=['POST'])
 def predict():
     try:
+        # Check if model and data are loaded
+        if model is None:
+            raise Exception("Model failed to load during startup. Check server logs.")
+        if data is None:
+            raise Exception("Dataset failed to load during startup. Check server logs.")
+        
         # Extract form data
         quarter = int(request.form['quarter'])
         department = int(request.form['department'])
@@ -171,6 +216,8 @@ def predict():
         no_of_style_change = int(request.form['no_of_style_change'])
         no_of_workers = float(request.form['no_of_workers'])
         month = int(request.form['month'])
+        
+        print(f"Received form data: quarter={quarter}, dept={department}, day={day}, team={team}")
         
         # Prepare data for model prediction
         total = [[quarter, department, day, team, targeted_productivity, smv, over_time, 
@@ -194,9 +241,16 @@ def predict():
         }
         
         print("Input data:", total)
-        prediction = model.predict(total)
-        predicted_value = prediction[0]
-        print("Prediction:", predicted_value)
+        
+        # Make prediction
+        try:
+            prediction = model.predict(total)
+            predicted_value = float(prediction[0])
+            print(f"Prediction successful: {predicted_value}")
+        except Exception as pred_error:
+            print(f"Prediction error: {str(pred_error)}")
+            traceback.print_exc()
+            raise Exception(f"Model prediction failed: {str(pred_error)}")
         
         # Determine productivity level
         if predicted_value <= 0.3:
@@ -211,24 +265,53 @@ def predict():
         
         # Generate dynamic graphs based on submitted data
         print("Generating dynamic analysis graphs...")
+        graphs = []
         
-        # Check cache first for performance optimization
-        cache_key = generate_cache_key(input_data_dict, predicted_value)
-        
-        if cache_key in graph_cache:
-            print(f"Using cached graphs for request (cache key: {cache_key[:8]}...)")
-            graphs = graph_cache[cache_key]
-        else:
-            # Generate fresh graphs for this specific data submission
-            graphs = []
-            try:
-                # Generate each graph with submitted data highlighted
-                graphs.append(generate_dynamic_correlation_heatmap(input_data_dict))
-                graphs.append(generate_dynamic_productivity_distribution(predicted_value))
-                graphs.append(generate_dynamic_department_productivity(department, predicted_value))
-                graphs.append(generate_dynamic_overtime_productivity(over_time, predicted_value))
-                graphs.append(generate_dynamic_incentive_impact(incentive, predicted_value))
-                graphs.append(generate_dynamic_team_productivity(team, no_of_workers, predicted_value))
+        try:
+            # Check cache first for performance optimization
+            cache_key = generate_cache_key(input_data_dict, predicted_value)
+            
+            if cache_key in graph_cache:
+                print(f"Using cached graphs for request (cache key: {cache_key[:8]}...)")
+                graphs = graph_cache[cache_key]
+            else:
+                # Generate fresh graphs for this specific data submission
+                print("Generating new graphs...")
+                try:
+                    graphs.append(generate_dynamic_correlation_heatmap(input_data_dict))
+                    print("Generated correlation heatmap")
+                except Exception as e:
+                    print(f"Error generating correlation heatmap: {str(e)}")
+                
+                try:
+                    graphs.append(generate_dynamic_productivity_distribution(predicted_value))
+                    print("Generated productivity distribution")
+                except Exception as e:
+                    print(f"Error generating productivity distribution: {str(e)}")
+                
+                try:
+                    graphs.append(generate_dynamic_department_productivity(department, predicted_value))
+                    print("Generated department productivity")
+                except Exception as e:
+                    print(f"Error generating department productivity: {str(e)}")
+                
+                try:
+                    graphs.append(generate_dynamic_overtime_productivity(over_time, predicted_value))
+                    print("Generated overtime productivity")
+                except Exception as e:
+                    print(f"Error generating overtime productivity: {str(e)}")
+                
+                try:
+                    graphs.append(generate_dynamic_incentive_impact(incentive, predicted_value))
+                    print("Generated incentive impact")
+                except Exception as e:
+                    print(f"Error generating incentive impact: {str(e)}")
+                
+                try:
+                    graphs.append(generate_dynamic_team_productivity(team, no_of_workers, predicted_value))
+                    print("Generated team productivity")
+                except Exception as e:
+                    print(f"Error generating team productivity: {str(e)}")
                 
                 print(f"Successfully generated {len(graphs)} dynamic graphs")
                 
@@ -236,23 +319,30 @@ def predict():
                 if len(graph_cache) > 100:  # Keep only last 100 unique predictions
                     # Remove oldest entry
                     graph_cache.pop(next(iter(graph_cache)))
-                graph_cache[cache_key] = graphs
-                
-            except Exception as e:
-                print(f"Error generating graphs: {str(e)}")
-                graphs = []
+                if graphs:  # Only cache if we have graphs
+                    graph_cache[cache_key] = graphs
+                    
+        except Exception as graph_error:
+            print(f"Error in graph generation process: {str(graph_error)}")
+            traceback.print_exc()
+            # Continue without graphs
+            graphs = []
         
+        print(f"Returning results with {len(graphs)} graphs")
         return render_template('submit.html', 
                              prediction_text=text,
                              prediction_value=round(predicted_value, 4),
                              productivity_class=productivity_class,
                              graphs=graphs)
+                             
     except Exception as e:
-        print(f"Error in prediction: {str(e)}")
-        import traceback
+        error_msg = str(e)
+        print(f"Error in prediction: {error_msg}")
         traceback.print_exc()
+        
+        # Return more detailed error message
         return render_template('submit.html', 
-                             prediction_text='Error in prediction. Please check your inputs.',
+                             prediction_text=f'Error in prediction: {error_msg}',
                              prediction_value=0,
                              productivity_class='error',
                              graphs=[])

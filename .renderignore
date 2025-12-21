@@ -1,0 +1,26 @@
+# Only ignore files that are definitely not needed for deployment
+# Keep model files, dataset, and all Flask files
+
+# Ignore Jupyter notebook files
+*.ipynb
+TrainingFiles/
+
+# Ignore Git files
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+
+# Ignore local test files
+run_app.bat
+production_server.py
+
+# DO NOT ignore these (they are required):
+# Flask/gwp.pkl
+# Dataset/
+# Flask/static/
+# Flask/templates/
