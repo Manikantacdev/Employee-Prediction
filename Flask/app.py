@@ -23,6 +23,13 @@ PROJECT_ROOT = os.path.dirname(BASE_DIR)
 print(f"Base directory: {BASE_DIR}")
 print(f"Project root: {PROJECT_ROOT}")
 
+# Define feature names for XGBoost (must match training data)
+FEATURE_NAMES = [
+    'quarter', 'department', 'day', 'team', 'targeted_productivity', 
+    'smv', 'wip', 'over_time', 'incentive', 'idle_time', 'idle_men', 
+    'no_of_style_change', 'no_of_workers'
+]
+
 # Load model - Try multiple formats for maximum compatibility
 model = None
 model_type = None
@@ -30,26 +37,13 @@ model_type = None
 try:
     import xgboost as xgb
     
-    # Define model paths (order: xgb binary > pickle > json)
-    xgb_model_path = os.path.join(BASE_DIR, 'gwp.xgb')
+    # Define model paths (order: pickle > xgb binary > json)
     pkl_model_path = os.path.join(BASE_DIR, 'gwp.pkl')
+    xgb_model_path = os.path.join(BASE_DIR, 'gwp.xgb')
     json_model_path = os.path.join(BASE_DIR, 'gwp.json')
     
-    # Try XGBoost binary format first (most reliable for deployment)
-    if os.path.exists(xgb_model_path):
-        print(f"Loading model from XGBoost binary: {xgb_model_path}")
-        model = xgb.Booster()
-        model.load_model(xgb_model_path)
-        model_type = 'xgb'
-        print(f"✓ Model loaded successfully from XGBoost binary format!")
-        
-        # Test with dummy data
-        test_data = xgb.DMatrix(np.array([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]]))
-        test_pred = model.predict(test_data)
-        print(f"✓ Model test prediction: {test_pred[0]:.4f}")
-        
-    # Try pickle format (scikit-learn wrapper)
-    elif os.path.exists(pkl_model_path):
+    # Try pickle format first (scikit-learn wrapper - most compatible)
+    if os.path.exists(pkl_model_path):
         print(f"Loading model from pickle: {pkl_model_path}")
         
         # Suppress XGBoost serialization warnings
@@ -69,7 +63,23 @@ try:
         # Test with dummy data
         test_pred = model.predict([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]])
         print(f"✓ Model test prediction: {test_pred[0]:.4f}")
+    
+    # Try XGBoost binary format (requires feature names)
+    elif os.path.exists(xgb_model_path):
+        print(f"Loading model from XGBoost binary: {xgb_model_path}")
+        model = xgb.Booster()
+        model.load_model(xgb_model_path)
+        model_type = 'xgb'
+        print(f"✓ Model loaded successfully from XGBoost binary format!")
         
+        # Test with dummy data (provide feature names)
+        test_data = xgb.DMatrix(
+            np.array([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]]),
+            feature_names=FEATURE_NAMES
+        )
+        test_pred = model.predict(test_data)
+        print(f"✓ Model test prediction: {test_pred[0]:.4f}")
+    
     # Last resort: try JSON (may have compatibility issues with old XGBoost versions)
     elif os.path.exists(json_model_path) and os.path.getsize(json_model_path) > 100:
         print(f"Loading model from JSON: {json_model_path}")
@@ -78,12 +88,15 @@ try:
         model_type = 'json'
         print(f"✓ Model loaded successfully from JSON format!")
         
-        # Test with dummy data
-        test_data = xgb.DMatrix(np.array([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]]))
+        # Test with dummy data (provide feature names)
+        test_data = xgb.DMatrix(
+            np.array([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]]),
+            feature_names=FEATURE_NAMES
+        )
         test_pred = model.predict(test_data)
         print(f"✓ Model test prediction: {test_pred[0]:.4f}")
     else:
-        raise FileNotFoundError(f"No model file found (tried {xgb_model_path}, {pkl_model_path}, {json_model_path})")
+        raise FileNotFoundError(f"No model file found (tried {pkl_model_path}, {xgb_model_path}, {json_model_path})")
         
 except Exception as e:
     print(f"✗ ERROR loading model: {str(e)}")
@@ -300,9 +313,9 @@ def predict():
         # Make prediction - handle XGB binary, JSON, and pickle formats
         try:
             if model_type in ['xgb', 'json']:
-                # XGBoost Booster format requires DMatrix
+                # XGBoost Booster format requires DMatrix with feature names
                 import xgboost as xgb
-                dmatrix = xgb.DMatrix(np.array(total))
+                dmatrix = xgb.DMatrix(np.array(total), feature_names=FEATURE_NAMES)
                 prediction = model.predict(dmatrix)
             else:
                 # Standard pickle format (scikit-learn wrapper)
