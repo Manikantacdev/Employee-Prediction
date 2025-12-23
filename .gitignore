@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Model backups (keep only main model)
+Flask/gwp_backup.pkl
+Flask/gwp.xgb
+Flask/gwp.json
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs
+*.log
+
+# Local test files
+Flask/test_*.py
+Flask/verify_model.py
+Flask/fix_model.py
+Flask/convert_model_to_json.py
+Flask/retrain_and_save_properly.py
+
+# Windows batch files
+*.bat
+
+# Output images (optional - you may want to keep these)
+Output images/
+
+# Documentation (keep in repo, but listed here as reference)
+# README.md
+# DEPLOYMENT_GUIDE.md
