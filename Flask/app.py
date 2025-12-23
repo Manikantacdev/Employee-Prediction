@@ -23,38 +23,57 @@ PROJECT_ROOT = os.path.dirname(BASE_DIR)
 print(f"Base directory: {BASE_DIR}")
 print(f"Project root: {PROJECT_ROOT}")
 
-# Load model from Flask folder with error handling
+# Load model - Try JSON format first (better for deployment), then fallback to pickle
+model = None
+model_type = None
+
 try:
-    model_path = os.path.join(BASE_DIR, 'gwp.pkl')
-    print(f"Loading model from: {model_path}")
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model file not found at {model_path}")
+    import xgboost as xgb
     
-    # Suppress XGBoost serialization warnings for old models
-    import warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=UserWarning)
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
+    # Try JSON format first (recommended for production)
+    json_model_path = os.path.join(BASE_DIR, 'gwp.json')
+    pkl_model_path = os.path.join(BASE_DIR, 'gwp.pkl')
     
-    # Verify model loaded correctly
-    if model is None:
-        raise ValueError("Model loaded as None")
-    
-    print(f"✓ Model loaded successfully! Type: {type(model).__name__}")
-    
-    # Test with dummy data to ensure it works
-    try:
+    if os.path.exists(json_model_path) and os.path.getsize(json_model_path) > 100:
+        print(f"Loading model from JSON: {json_model_path}")
+        model = xgb.Booster()
+        model.load_model(json_model_path)
+        model_type = 'json'
+        print(f"✓ Model loaded successfully from JSON format!")
+        
+        # Test with dummy data
+        test_data = xgb.DMatrix(np.array([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]]))
+        test_pred = model.predict(test_data)
+        print(f"✓ Model test prediction: {test_pred[0]:.4f}")
+        
+    elif os.path.exists(pkl_model_path):
+        print(f"JSON not found, loading model from pickle: {pkl_model_path}")
+        
+        # Suppress XGBoost serialization warnings for old models
+        import warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=UserWarning)
+            with open(pkl_model_path, 'rb') as f:
+                model = pickle.load(f)
+        
+        model_type = 'pickle'
+        
+        if model is None:
+            raise ValueError("Model loaded as None")
+        
+        print(f"✓ Model loaded successfully from pickle! Type: {type(model).__name__}")
+        
+        # Test with dummy data
         test_pred = model.predict([[2, 1, 2, 3, 0.8, 15.5, 5000, 100, 0.0, 0, 0, 50.0, 2]])
         print(f"✓ Model test prediction: {test_pred[0]:.4f}")
-    except Exception as test_error:
-        print(f"⚠ Model test warning: {test_error}")
-        # Continue anyway - the model might still work for actual predictions
+    else:
+        raise FileNotFoundError(f"No model file found (tried {json_model_path} and {pkl_model_path})")
         
 except Exception as e:
     print(f"✗ ERROR loading model: {str(e)}")
     traceback.print_exc()
     model = None
+    model_type = None
 
 # Load dataset once at startup with error handling
 try:
@@ -262,11 +281,19 @@ def predict():
         
         print("Input data:", total)
         
-        # Make prediction
+        # Make prediction - handle both JSON and pickle model types
         try:
-            prediction = model.predict(total)
+            if model_type == 'json':
+                # XGBoost JSON format requires DMatrix
+                import xgboost as xgb
+                dmatrix = xgb.DMatrix(np.array(total))
+                prediction = model.predict(dmatrix)
+            else:
+                # Standard pickle format (scikit-learn interface)
+                prediction = model.predict(total)
+            
             predicted_value = float(prediction[0])
-            print(f"Prediction successful: {predicted_value}")
+            print(f"Prediction successful ({model_type} format): {predicted_value}")
         except Exception as pred_error:
             print(f"Prediction error: {str(pred_error)}")
             traceback.print_exc()
