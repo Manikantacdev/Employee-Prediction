@@ -1,7 +1,10 @@
 services:
   - type: web
     name: employee-prediction
-    runtime: python
+    env: python
     plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: cd Flask && gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 app:app
+    startCommand: cd Flask && python production_server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
