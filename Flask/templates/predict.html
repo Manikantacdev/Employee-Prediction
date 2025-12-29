@@ -4,31 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predict Productivity</title>
+    <title>Predict - Employee Performance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/predict.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
-    <div class="navbar">
-        <h1><i class="fas fa-chart-line"></i> Employee Productivity Prediction</h1>
-        <div class="nav-links">
-            <a href="/"><i class="fas fa-home"></i> Home</a>
-            <a href="/about"><i class="fas fa-info-circle"></i> About</a>
-            <a href="/predict"><i class="fas fa-brain"></i> Predict</a>
+    <nav class="navbar animate-up">
+        <div class="brand">
+            <h1>ACID<span class="text-accent">MIND</span></h1>
         </div>
-    </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/predict">Predict</a>
+        </div>
+    </nav>
 
-    <div class="container">
-        <div class="form-wrapper">
-            <div class="form-container">
-                <h2><i class="fas fa-user-chart"></i> Employee Data Input</h2>
+    <div class="container page-container">
+        <h2 class="section-title animate-up">Initialize Prediction Sequence</h2>
+
+        <div class="split-layout">
+            <div class="form-panel animate-up delay-1">
                 <form action="/pred" method="POST">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="month"><i class="fas fa-calendar"></i> Month</label>
-                            <select id="month" name="month" required>
+                            <label>Month</label>
+                            <select name="month" required>
                                 <option value="">Select Month</option>
                                 <option value="1">January</option>
                                 <option value="2">February</option>
@@ -45,8 +48,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="quarter"><i class="fas fa-calendar-alt"></i> Quarter</label>
-                            <select id="quarter" name="quarter" required>
+                            <label>Quarter</label>
+                            <select name="quarter" required>
                                 <option value="">Select Quarter</option>
                                 <option value="1">Quarter 1</option>
                                 <option value="2">Quarter 2</option>
@@ -56,16 +59,16 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="department"><i class="fas fa-building"></i> Department</label>
-                            <select id="department" name="department" required>
+                            <label>Department</label>
+                            <select name="department" required>
                                 <option value="">Select Department</option>
                                 <option value="0">Finishing</option>
                                 <option value="1">Sewing</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="day"><i class="fas fa-sun"></i> Day of Week</label>
-                            <select id="day" name="day" required>
+                            <label>Day of Week</label>
+                            <select name="day" required>
                                 <option value="">Select Day</option>
                                 <option value="0">Monday</option>
                                 <option value="1">Tuesday</option>
@@ -77,71 +80,84 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="team"><i class="fas fa-users"></i> Team Number</label>
-                            <input type="number" id="team" name="team" required min="1" max="12" placeholder="Enter team (1-12)">
+                            <label>Team</label>
+                            <input type="number" name="team" required min="1" max="12" placeholder="1-12">
                         </div>
                         <div class="form-group">
-                            <label for="targeted_productivity"><i class="fas fa-bullseye"></i> Targeted Productivity</label>
-                            <input type="number" step="0.01" id="targeted_productivity" name="targeted_productivity" required min="0" max="1" placeholder="e.g., 0.80">
+                            <label>Targeted Productivity</label>
+                            <input type="number" step="0.01" name="targeted_productivity" required min="0" max="1"
+                                placeholder="e.g. 0.80">
                         </div>
                         <div class="form-group">
-                            <label for="smv"><i class="fas fa-clock"></i> SMV (Standard Minute Value)</label>
-                            <input type="number" step="0.01" id="smv" name="smv" required min="0" placeholder="e.g., 26.16">
+                            <label>SMV</label>
+                            <input type="number" step="0.01" name="smv" required min="0"
+                                placeholder="Std. Minute Value">
                         </div>
                         <div class="form-group">
-                            <label for="wip"><i class="fas fa-tasks"></i> WIP (Work in Progress)</label>
-                            <input type="number" id="wip" name="wip" min="0" placeholder="e.g., 1108 (optional)">
+                            <label>WIP</label>
+                            <input type="number" name="wip" min="0" placeholder="Optional">
                         </div>
                         <div class="form-group">
-                            <label for="over_time"><i class="fas fa-hourglass-half"></i> Over Time (minutes)</label>
-                            <input type="number" id="over_time" name="over_time" required min="0" placeholder="e.g., 7080">
+                            <label>Overtime (Min)</label>
+                            <input type="number" name="over_time" required min="0" placeholder="e.g. 7080">
                         </div>
                         <div class="form-group">
-                            <label for="incentive"><i class="fas fa-coins"></i> Incentive (BDT)</label>
-                            <input type="number" id="incentive" name="incentive" required min="0" placeholder="e.g., 98">
+                            <label>Incentive (BDT)</label>
+                            <input type="number" name="incentive" required min="0" placeholder="e.g. 98">
                         </div>
                         <div class="form-group">
-                            <label for="idle_time"><i class="fas fa-pause-circle"></i> Idle Time (minutes)</label>
-                            <input type="number" id="idle_time" name="idle_time" required min="0" value="0" placeholder="e.g., 0">
+                            <label>Idle Time</label>
+                            <input type="number" name="idle_time" required min="0" value="0">
                         </div>
                         <div class="form-group">
-                            <label for="idle_men"><i class="fas fa-user-slash"></i> Idle Men</label>
-                            <input type="number" id="idle_men" name="idle_men" required min="0" value="0" placeholder="e.g., 0">
+                            <label>Idle Men</label>
+                            <input type="number" name="idle_men" required min="0" value="0">
                         </div>
                         <div class="form-group">
-                            <label for="no_of_style_change"><i class="fas fa-exchange-alt"></i> No. of Style Changes</label>
-                            <input type="number" id="no_of_style_change" name="no_of_style_change" required min="0" value="0" placeholder="e.g., 0">
+                            <label>Style Changes</label>
+                            <input type="number" name="no_of_style_change" required min="0" value="0">
                         </div>
                         <div class="form-group">
-                            <label for="no_of_workers"><i class="fas fa-user-friends"></i> No. of Workers</label>
-                            <input type="number" step="0.5" id="no_of_workers" name="no_of_workers" required min="1" placeholder="e.g., 59">
+                            <label>No. of Workers</label>
+                            <input type="number" step="0.5" name="no_of_workers" required min="1" placeholder="e.g. 59">
                         </div>
                     </div>
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-paper-plane"></i> Predict Productivity
+
+                    <button type="submit" class="acid-btn"
+                        style="width: 100%; justify-content: center; margin-top: 30px;">
+                        Execute Prediction
                     </button>
                 </form>
             </div>
 
-            <div class="illustration">
-                <i class="fas fa-chart-line"></i>
-                <h3>AI-Powered Prediction</h3>
-                <p>Our advanced machine learning model analyzes 13 key factors to accurately predict employee productivity levels.</p>
-                
-                <div class="info-card">
-                    <h4>What You'll Get:</h4>
+            <div class="info-sidebar animate-up delay-2">
+                <div class="info-box">
+                    <h3><i class="fas fa-info-circle"></i> Input Protocol</h3>
+                    <p style="margin-bottom: 20px;">Ensure all numeric fields are within standard deviation parameters
+                        for accurate model throughput.</p>
                     <ul>
-                        <li>Productivity classification (Average/Medium/High)</li>
-                        <li>Correlation heatmap analysis</li>
-                        <li>Department-wise productivity insights</li>
-                        <li>Overtime impact visualization</li>
-                        <li>Incentive effectiveness analysis</li>
-                        <li>Team performance metrics</li>
+                        <li><span class="text-accent">Target:</span> Normalized between 0.0 and 1.0</li>
+                        <li><span class="text-accent">WIP:</span> Work in Progress limit</li>
+                        <li><span class="text-accent">SMV:</span> Standard Minute Allocation</li>
                     </ul>
+                </div>
+
+                <div class="info-box" style="border-left-color: #fff;">
+                    <h3>System Status</h3>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                        <div
+                            style="width: 10px; height: 10px; background: #0f0; border-radius: 50%; box-shadow: 0 0 10px #0f0;">
+                        </div>
+                        <span>Model Active</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <footer>
+        <p>&copy; 2025 AcidMind. All Systems Nominal.</p>
+    </footer>
 
 </body>
 

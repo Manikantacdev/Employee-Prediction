@@ -4,148 +4,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Employee Productivity Prediction</title>
+    <title>About - Employee Performance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
-    <div class="navbar">
-        <h1><i class="fas fa-chart-line"></i> Employee Productivity Prediction</h1>
+    <nav class="navbar animate-up">
+        <div class="brand">
+            <h1>ACID<span class="text-accent">MIND</span></h1>
+        </div>
         <div class="nav-links">
-            <a href="/"><i class="fas fa-home"></i> Home</a>
-            <a href="/about"><i class="fas fa-info-circle"></i> About</a>
-            <a href="/predict"><i class="fas fa-brain"></i> Predict</a>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/predict">Predict</a>
         </div>
-    </div>
+    </nav>
 
-    <div class="hero-section">
-        <h1>About Our Project</h1>
-        <p>Leveraging Machine Learning to Transform Workforce Productivity Analysis and Drive Organizational Success</p>
-    </div>
-
-    <div class="content-section">
-        <div class="container">
-            <h2 class="section-title">What We Do</h2>
-            
-            <div class="info-grid">
-                <div class="info-card">
-                    <i class="fas fa-bullseye"></i>
-                    <h3>Our Mission</h3>
-                    <p>To provide organizations with cutting-edge machine learning tools that accurately predict employee productivity, enabling data-driven decisions that improve workplace efficiency and employee satisfaction.</p>
-                </div>
-                
-                <div class="info-card">
-                    <i class="fas fa-eye"></i>
-                    <h3>Our Vision</h3>
-                    <p>To become the leading platform for workforce analytics, empowering businesses worldwide to optimize their human resources and create more productive, engaged work environments.</p>
-                </div>
-                
-                <div class="info-card">
-                    <i class="fas fa-lightbulb"></i>
-                    <h3>The Problem</h3>
-                    <p>Traditional productivity assessment methods are time-consuming, subjective, and often inaccurate. Organizations struggle to identify productivity patterns and make informed workforce decisions.</p>
-                </div>
-                
-                <div class="info-card">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Our Solution</h3>
-                    <p>We use advanced machine learning algorithms trained on comprehensive employee data to provide instant, accurate productivity predictions with detailed analytical insights and actionable recommendations.</p>
-                </div>
-            </div>
-
-            <h2 class="section-title">Key Features</h2>
-            
-            <div class="features-list">
-                <div class="feature-item">
-                    <i class="fas fa-database"></i>
-                    <h4>Data-Driven</h4>
-                    <p>Analyzes 13+ factors including department, team size, overtime, and incentives</p>
-                </div>
-                
-                <div class="feature-item">
-                    <i class="fas fa-chart-pie"></i>
-                    <h4>Visual Analytics</h4>
-                    <p>Comprehensive charts and graphs showing productivity patterns and correlations</p>
-                </div>
-                
-                <div class="feature-item">
-                    <i class="fas fa-bolt"></i>
-                    <h4>Instant Results</h4>
-                    <p>Real-time predictions with detailed breakdown of contributing factors</p>
-                </div>
-                
-                <div class="feature-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <h4>High Accuracy</h4>
-                    <p>95%+ prediction accuracy using ensemble learning techniques</p>
-                </div>
-                
-                <div class="feature-item">
-                    <i class="fas fa-mobile-alt"></i>
-                    <h4>Responsive Design</h4>
-                    <p>Works seamlessly on desktop, tablet, and mobile devices</p>
-                </div>
-                
-                <div class="feature-item">
-                    <i class="fas fa-cogs"></i>
-                    <h4>Easy Integration</h4>
-                    <p>Simple API for integration with existing HR systems</p>
-                </div>
-            </div>
-
-            <h2 class="section-title" style="margin-top: 80px;">How It Works</h2>
-            
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-keyboard"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Step 1: Input Data</h4>
-                        <p>Enter employee and work-related parameters including department, team size, targeted productivity, overtime hours, incentives, and other relevant metrics.</p>
-                    </div>
-                </div>
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Step 2: AI Analysis</h4>
-                        <p>Our machine learning model processes the data, analyzing patterns and relationships between various factors that influence productivity.</p>
-                    </div>
-                </div>
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Step 3: Generate Insights</h4>
-                        <p>The system generates comprehensive visualizations including correlation heatmaps, distribution charts, and comparative analytics.</p>
-                    </div>
-                </div>
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Step 4: Get Results</h4>
-                        <p>Receive detailed productivity predictions categorized as average, medium, or high, along with actionable insights for improvement.</p>
-                    </div>
+    <div class="container">
+        <div class="hero" style="min-height: 50vh;">
+            <div class="hero-content">
+                <div class="hero-text animate-up delay-1">
+                    <h2>Our <span class="text-accent">Mission</span></h2>
+                    <p>To deconstruct workforce dynamics through rigorous data analysis, providing clear, actionable
+                        intelligence for the modern enterprise.</p>
                 </div>
             </div>
         </div>
+
+        <div class="timeline animate-up delay-2">
+            <div class="timeline-center-line"></div>
+
+            <div class="timeline-item">
+                <div class="t-number">01</div>
+                <div class="t-content">
+                    <h3>Data Ingestion</h3>
+                    <p>We aggregate raw data points including overtime, incentive structures, and team hierarchy. This
+                        forms the bedrock of our analysis.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="t-number">02</div>
+                <div class="t-content">
+                    <h3>Neural Processing</h3>
+                    <p>Data is fed into our customized Random Forest and Gradient Boosting ensemble models, trained on
+                        thousands of historical records.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="t-number">03</div>
+                <div class="t-content">
+                    <h3>Pattern Extraction</h3>
+                    <p>The system identifies non-linear correlations between disparate variables, highlighting
+                        inefficiencies that human analysis might miss.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="t-number">04</div>
+                <div class="t-content">
+                    <h3>Actionable Output</h3>
+                    <p>Results are visualized in high-contrast heatmaps and scored metrics, allowing for immediate
+                        strategic implementation.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; padding: 100px 0;">
+            <h2 class="section-title">Ready to optimize?</h2>
+            <a href="/predict" class="acid-btn">Start Analysis <i class="fas fa-arrow-right"></i></a>
+        </div>
+
     </div>
 
-    <div class="cta-section">
-        <h2>Ready to Optimize Your Workforce?</h2>
-        <p>Start predicting employee productivity with advanced machine learning today</p>
-        <a href="/predict" class="cta-button">Try It Now <i class="fas fa-arrow-right"></i></a>
-    </div>
+    <footer>
+        <p>&copy; 2025 AcidMind. All Systems Nominal.</p>
+    </footer>
 
 </body>
 
