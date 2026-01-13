@@ -103,23 +103,7 @@ cd Flask
 python production_server.py
 ```
 
-Access at `http://localhost:8080` (Production) or `http://localhost:5000` (Dev).
-
-## ☁️ Deployment
-
-### Recommended: Render (Free Tier)
-
-This project includes a `render.yaml` for automatic deployment.
-
-1. Push your code to GitHub.
-2. Sign up at [Render.com](https://render.com).
-3. Create a **New Web Service** and connect your repo.
-4. Render will auto-detect the configuration and deploy.
-
-**Manual Configuration on Render:**
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `python production_server.py`
-- **Environment Variable**: `PYTHON_VERSION` = `3.12.0`
+Access at `http://localhost:8080`
 
 ## � Usage Guide
 
